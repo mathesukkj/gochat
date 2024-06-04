@@ -10,7 +10,11 @@ import (
 	"github.com/mathesukkj/gochat/internal/dto"
 )
 
+var conns = make(chan *websocket.Conn)
+var msgs = make(chan string)
+
 func NewWsServer(ws *websocket.Conn) {
+	conns <- ws
 	for {
 		message := dto.Message{
 			SentAt: time.Now(),
@@ -21,14 +25,33 @@ func NewWsServer(ws *websocket.Conn) {
 			break
 		}
 
-		if err := websocket.Message.Send(ws, message.ToString()); err != nil {
-			fmt.Println(err)
-			break
-		}
+		msgs <- message.ToString()
 	}
 }
 
-func HandleWs(w http.ResponseWriter, req *http.Request) {
+func SendMessage(conns chan *websocket.Conn) {
+
+}
+
+func HandleWs(w http.ResponseWriter, r *http.Request) {
 	s := websocket.Server{Handler: websocket.Handler(NewWsServer)}
-	s.ServeHTTP(w, req)
+	s.ServeHTTP(w, r)
+}
+
+func InitServer(port string) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", HandleWs)
+
+	go func() {
+		for conn := range conns {
+			for msg := range msgs {
+				websocket.Message.Send(conn, msg)
+				fmt.Println("loop ", msg)
+			}
+		}
+	}()
+
+	if err := http.ListenAndServe(port, mux); err != nil {
+		panic("ListenAndServe: " + err.Error())
+	}
 }
