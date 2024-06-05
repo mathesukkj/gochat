@@ -29,8 +29,10 @@ func NewWsServer(ws *websocket.Conn) {
 	}
 }
 
-func SendMessage(conns chan *websocket.Conn) {
-
+func SendMessage() {
+	for {
+		fmt.Println(<-conns)
+	}
 }
 
 func HandleWs(w http.ResponseWriter, r *http.Request) {
@@ -42,12 +44,11 @@ func InitServer(port string) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", HandleWs)
 
+	go SendMessage()
+
 	go func() {
-		for conn := range conns {
-			for msg := range msgs {
-				websocket.Message.Send(conn, msg)
-				fmt.Println("loop ", msg)
-			}
+		for {
+			fmt.Println(<-msgs)
 		}
 	}()
 
