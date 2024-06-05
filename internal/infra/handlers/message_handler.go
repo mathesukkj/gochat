@@ -10,11 +10,11 @@ import (
 	"github.com/mathesukkj/gochat/internal/dto"
 )
 
-var conns = make(chan *websocket.Conn)
+var conns = make([]*websocket.Conn, 0)
 var msgs = make(chan string)
 
 func NewWsServer(ws *websocket.Conn) {
-	conns <- ws
+	conns = append(conns, ws)
 	for {
 		message := dto.Message{
 			SentAt: time.Now(),
@@ -31,7 +31,10 @@ func NewWsServer(ws *websocket.Conn) {
 
 func SendMessage() {
 	for {
-		fmt.Println(<-conns)
+		message := <-msgs
+		for _, conn := range conns {
+			websocket.Message.Send(conn, message)
+		}
 	}
 }
 
@@ -45,12 +48,6 @@ func InitServer(port string) {
 	mux.HandleFunc("/", HandleWs)
 
 	go SendMessage()
-
-	go func() {
-		for {
-			fmt.Println(<-msgs)
-		}
-	}()
 
 	if err := http.ListenAndServe(port, mux); err != nil {
 		panic("ListenAndServe: " + err.Error())
