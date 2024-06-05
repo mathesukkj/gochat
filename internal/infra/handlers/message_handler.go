@@ -15,14 +15,16 @@ var clients = make([]*dto.WebsocketClient, 0)
 var msgs = make(chan dto.Message)
 
 func NewWsServer(ws *websocket.Conn) {
-	clients = append(clients, &dto.WebsocketClient{
+	client := dto.WebsocketClient{
 		Id:   uuid.New().String(),
 		Conn: ws,
-	})
+	}
+	clients = append(clients, &client)
 
 	for {
 		message := dto.Message{
 			SentAt: time.Now(),
+			SentBy: client,
 		}
 
 		if err := websocket.Message.Receive(ws, &message.Message); err != nil {
@@ -38,7 +40,9 @@ func SendMessage() {
 	for {
 		message := <-msgs
 		for _, client := range clients {
-			websocket.Message.Send(client.Conn, message.ToString())
+			if client.Id != message.SentBy.Id {
+				websocket.Message.Send(client.Conn, message.ToString())
+			}
 		}
 	}
 }

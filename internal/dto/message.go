@@ -5,6 +5,7 @@ import "time"
 type Message struct {
 	Message string
 	SentAt  time.Time
+	SentBy  WebsocketClient
 }
 
 func (m Message) ToString() string {
