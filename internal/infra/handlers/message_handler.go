@@ -5,16 +5,21 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/google/uuid"
 	"golang.org/x/net/websocket"
 
 	"github.com/mathesukkj/gochat/internal/dto"
 )
 
-var conns = make([]*websocket.Conn, 0)
-var msgs = make(chan string)
+var clients = make([]*dto.WebsocketClient, 0)
+var msgs = make(chan dto.Message)
 
 func NewWsServer(ws *websocket.Conn) {
-	conns = append(conns, ws)
+	clients = append(clients, &dto.WebsocketClient{
+		Id:   uuid.New().String(),
+		Conn: ws,
+	})
+
 	for {
 		message := dto.Message{
 			SentAt: time.Now(),
@@ -25,15 +30,15 @@ func NewWsServer(ws *websocket.Conn) {
 			break
 		}
 
-		msgs <- message.ToString()
+		msgs <- message
 	}
 }
 
 func SendMessage() {
 	for {
 		message := <-msgs
-		for _, conn := range conns {
-			websocket.Message.Send(conn, message)
+		for _, client := range clients {
+			websocket.Message.Send(client.Conn, message.ToString())
 		}
 	}
 }
