@@ -1,6 +1,10 @@
 package dto
 
-import "time"
+import (
+	"fmt"
+	"strings"
+	"time"
+)
 
 type Message struct {
 	Message string
@@ -10,5 +14,10 @@ type Message struct {
 
 func (m Message) ToString() string {
 	fmtTime := m.SentAt.Format("15:04")
-	return m.Message + "- \033[36m" + fmtTime + "\033[0m"
+	return fmt.Sprintf(
+		"\033[36m%s:\033[0m %s - \033[36m%s\033[0m",
+		strings.TrimSpace(m.SentBy.User),
+		m.Message,
+		fmtTime,
+	)
 }
