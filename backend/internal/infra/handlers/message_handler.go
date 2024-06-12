@@ -46,23 +46,23 @@ func NewWsServer(ws *websocket.Conn) {
 func GetUsername(ws *websocket.Conn) (username string, err error) {
 	sampleUsername := "Anonymous"
 
-	if err := websocket.Message.Send(ws, "\033[32mWhat is your username? Please type here: \033[0m"); err != nil {
-		return sampleUsername, err
-	}
+	// if err := websocket.Message.Send(ws, "\033[32mWhat is your username? Please type here: \033[0m"); err != nil {
+	// 	return sampleUsername, err
+	// }
+	//
+	// if err := websocket.Message.Receive(ws, &username); err != nil {
+	// 	return sampleUsername, err
+	// }
+	//
+	// if err := websocket.Message.Send(ws, "\033[32mGreat! You can start chatting now ;)\033[0m"); err != nil {
+	// 	return sampleUsername, err
+	// }
+	//
+	// if err := websocket.Message.Send(ws, "\n"); err != nil {
+	// 	return sampleUsername, err
+	// }
 
-	if err := websocket.Message.Receive(ws, &username); err != nil {
-		return sampleUsername, err
-	}
-
-	if err := websocket.Message.Send(ws, "\033[32mGreat! You can start chatting now ;)\033[0m"); err != nil {
-		return sampleUsername, err
-	}
-
-	if err := websocket.Message.Send(ws, "\n"); err != nil {
-		return sampleUsername, err
-	}
-
-	return username, nil
+	return sampleUsername, nil
 }
 
 func SendMessage(msgType string) {

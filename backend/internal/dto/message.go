@@ -1,6 +1,7 @@
 package dto
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -27,14 +28,16 @@ func (m Message) ToString() string {
 }
 
 func (m Message) ToJson() string {
-	return fmt.Sprintf(
-		`{
-      "message": "%s",
-      "sentBy": "%s",
-      "sentAt": "%v",
-    }`,
+	messageStruct := struct {
+		Message string `json:"message"`
+		SentBy  string `json:"sentBy"`
+		SentAt  string
+	}{
 		m.Message,
 		m.GetSenderUsername(),
-		m.SentAt,
-	)
+		m.SentAt.String(),
+	}
+	messagePayload, _ := json.Marshal(messageStruct)
+
+	return string(messagePayload)
 }
