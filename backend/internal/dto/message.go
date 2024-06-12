@@ -29,9 +29,9 @@ func (m Message) ToString() string {
 func (m Message) ToJson() string {
 	return fmt.Sprintf(
 		`{
-      message: %s,
-      sentBy: %s,
-      sentAt: %v,
+      "message": "%s",
+      "sentBy": "%s",
+      "sentAt": "%v",
     }`,
 		m.Message,
 		m.GetSenderUsername(),
