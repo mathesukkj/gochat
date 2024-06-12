@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	handlers.InitServer(":8020")
+	handlers.InitWebsocketServer(":8020", "json")
 }

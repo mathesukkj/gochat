@@ -65,12 +65,17 @@ func GetUsername(ws *websocket.Conn) (username string, err error) {
 	return username, nil
 }
 
-func SendMessage() {
+func SendMessage(msgType string) {
 	for {
 		message := <-msgs
+		messageStr := message.ToString()
+		if msgType == "json" {
+			messageStr = message.ToJson()
+		}
+
 		for _, client := range clients {
 			if client.Id != message.SentBy.Id && client.User != "" {
-				websocket.Message.Send(client.Conn, message.ToString())
+				websocket.Message.Send(client.Conn, messageStr)
 			}
 		}
 	}
@@ -81,11 +86,11 @@ func HandleWs(w http.ResponseWriter, r *http.Request) {
 	s.ServeHTTP(w, r)
 }
 
-func InitServer(port string) {
+func InitWebsocketServer(port, msgType string) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", HandleWs)
 
-	go SendMessage()
+	go SendMessage(msgType)
 
 	if err := http.ListenAndServe(port, mux); err != nil {
 		panic("ListenAndServe: " + err.Error())
