@@ -1,6 +1,7 @@
 package dto
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -31,6 +32,7 @@ func (s *WebsocketServer) Serve() {
 
 	go s.BroadcastMessagesToClients()
 
+	fmt.Println("server started in port " + s.Port + "!!")
 	if err := http.ListenAndServe(s.Port, mux); err != nil {
 		panic("ListenAndServe: " + err.Error())
 	}
