@@ -1,9 +1,8 @@
 package main
 
-import (
-	"github.com/mathesukkj/gochat/internal/infra/handlers"
-)
+import "github.com/mathesukkj/gochat/internal/dto"
 
 func main() {
-	handlers.InitWebsocketServer(":8020", "json")
+	server := dto.NewWebsocketServer(":8000", "json")
+	server.Serve()
 }

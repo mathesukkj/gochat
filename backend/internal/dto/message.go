@@ -10,14 +10,21 @@ import (
 type Message struct {
 	Message string
 	SentAt  time.Time
-	SentBy  WebsocketClient
+	SentBy  *WebsocketClient
 }
 
 func (m Message) GetSenderUsername() string {
 	return strings.TrimSpace(m.SentBy.User)
 }
 
-func (m Message) ToString() string {
+func (m Message) ToString(messageType string) string {
+	if messageType == "json" {
+		return m.toJson()
+	}
+	return m.toText()
+}
+
+func (m Message) toText() string {
 	fmtTime := m.SentAt.Format("15:04")
 	return fmt.Sprintf(
 		"\033[36m%s:\033[0m %s - \033[36m%s\033[0m",
@@ -27,7 +34,7 @@ func (m Message) ToString() string {
 	)
 }
 
-func (m Message) ToJson() string {
+func (m Message) toJson() string {
 	messageStruct := struct {
 		Message string `json:"message"`
 		SentBy  string `json:"sentBy"`
